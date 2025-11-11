@@ -19,11 +19,12 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PostMapping("/scheduler")
+    @PostMapping("/users/{userId}/scheduler")
     public ResponseEntity<CreateScheduleResponse> save(
+            @PathVariable Long userId,
             @RequestBody CreateScheduleRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(userId, request));
     }
 
     /**

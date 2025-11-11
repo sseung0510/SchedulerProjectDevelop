@@ -1,6 +1,7 @@
 package com.schedulerprojectdevelop.schedule.entity;
 
 import com.schedulerprojectdevelop.common.entity.BaseTimeEntity;
+import com.schedulerprojectdevelop.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,19 +18,21 @@ public class Schedule extends BaseTimeEntity {
     private Long scheduleId;
 
     @Column(nullable = false)
-    private String userName;
-
-    @Column(nullable = false)
     private String scheduleTitle;
 
     @Column(nullable = false)
     private String scheduleContent;
 
-    public Schedule(String userName, String scheduleTitle, String scheduleContent) {
-        this.userName = userName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Schedule(String scheduleTitle, String scheduleContent, User user) {
         this.scheduleTitle = scheduleTitle;
         this.scheduleContent = scheduleContent;
+        this.user = user;
     }
+
 
     public void updateSchedule(String scheduleTitle, String scheduleContent) {
         this.scheduleTitle = scheduleTitle;
