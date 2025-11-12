@@ -50,28 +50,34 @@ public class UserController {
 
     /**
      * 유저 정보 수정
-     * @param userId
+     * @param
      * @param request
      * @return
      */
-    @PutMapping("/users/{userId}")
+    @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> update(
-            @PathVariable Long userId,
+            @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
             @RequestBody UpdateUserRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getUserId(), request));
     }
 
     /**
-     * 유저 삭제
-     * @param userId
+     * 유저 탈퇴
+     * @param
      * @return
      */
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/users")
     public ResponseEntity<Void> delete(
-            @PathVariable Long userId
+            @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
+            @RequestBody DeleteUserRequest request,
+            HttpSession session
     ) {
-        userService.delete(userId);
+        if (sessionUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.delete(sessionUser.getUserId(), request);
+        session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -86,6 +92,24 @@ public class UserController {
         SessionUser sessionUser = userService.login(request);
         session.setAttribute("loginUser", sessionUser);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 로그아웃
+     * @param sessionUser
+     * @param session
+     * @return
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser
+            , HttpSession session) {
+        if (sessionUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
