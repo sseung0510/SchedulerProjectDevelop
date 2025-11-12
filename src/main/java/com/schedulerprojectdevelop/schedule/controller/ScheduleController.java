@@ -20,7 +20,7 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PostMapping("/scheduler")
+    @PostMapping("/schedules")
     public ResponseEntity<CreateScheduleResponse> save(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @RequestBody CreateScheduleRequest request
@@ -32,7 +32,7 @@ public class ScheduleController {
      * 일정 전체 조회
      * @return
      */
-    @GetMapping("/scheduler")
+    @GetMapping("/schedules")
     public ResponseEntity<List<GetScheduleResponse>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findAll());
     }
@@ -42,7 +42,7 @@ public class ScheduleController {
      * @param scheduleId
      * @return
      */
-    @GetMapping("/scheduler/{scheduleId}")
+    @GetMapping("/schedules/{scheduleId}")
     public ResponseEntity<GetScheduleResponse> findOne(
             @PathVariable Long scheduleId
     ) {
@@ -55,24 +55,26 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PutMapping("/scheduler/{scheduleId}")
+    @PutMapping("/schedules/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> update(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId,
             @RequestBody UpdateScheduleRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(scheduleId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getUserId(), scheduleId, request));
     }
 
     /**
-     * 일정 수정
+     * 일정 삭제
      * @param scheduleId
      * @return
      */
-    @DeleteMapping("/scheduler/{scheduleId}")
+    @DeleteMapping("/schedules/{scheduleId}")
     public ResponseEntity<Void> delete(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId
     ) {
-        scheduleService.delete(scheduleId);
+        scheduleService.delete(sessionUser.getUserId(), scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
