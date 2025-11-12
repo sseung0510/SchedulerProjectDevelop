@@ -20,7 +20,6 @@ public class ScheduleService {
 
     /**
      * 일정 생성
-     *
      * @param userId
      * @param request
      * @return
@@ -34,8 +33,8 @@ public class ScheduleService {
         Schedule schedule = new Schedule(request.getScheduleTitle(), request.getScheduleContent(), user);
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return new CreateScheduleResponse(
-                savedSchedule.getScheduleId(),
-                savedSchedule.getUser().getUserId(),
+                savedSchedule.getId(),
+                savedSchedule.getUser().getId(),
                 savedSchedule.getScheduleTitle(),
                 savedSchedule.getScheduleContent(),
                 savedSchedule.getCreatedAt(),
@@ -52,8 +51,8 @@ public class ScheduleService {
         List<Schedule> schedules = scheduleRepository.findAll();
         return schedules.stream()
                 .map(schedule -> new GetScheduleResponse(
-                        schedule.getScheduleId(),
-                        schedule.getUser().getUserId(),
+                        schedule.getId(),
+                        schedule.getUser().getId(),
                         schedule.getScheduleTitle(),
                         schedule.getScheduleContent()
                 )).toList();
@@ -71,8 +70,8 @@ public class ScheduleService {
         );
 
         return new GetScheduleResponse(
-                schedule.getScheduleId(),
-                schedule.getUser().getUserId(),
+                schedule.getId(),
+                schedule.getUser().getId(),
                 schedule.getScheduleTitle(),
                 schedule.getScheduleContent()
         );
@@ -93,8 +92,8 @@ public class ScheduleService {
         schedule.updateSchedule(request.getScheduleTitle(), request.getScheduleContent());
 
         return new UpdateScheduleResponse(
-                schedule.getScheduleId(),
-                schedule.getUser().getUserId(),
+                schedule.getId(),
+                schedule.getUser().getId(),
                 schedule.getScheduleTitle(),
                 schedule.getScheduleContent(),
                 schedule.getCreatedAt(),
