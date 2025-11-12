@@ -5,8 +5,11 @@ import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.entity.User;
 import com.schedulerprojectdevelop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -106,11 +109,19 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    /**
+     * 로그인
+     * @param request
+     * @return
+     */
     @Transactional(readOnly = true)
     public SessionUser login(LoginRequest request) {
         User user = userRepository.findByUserEmail(request.getUserEmail()).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
+        if(!user.getUserPassword().equals(request.getUserPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
         return new SessionUser(
                 user.getId(),
                 user.getUserEmail()
