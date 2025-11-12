@@ -3,14 +3,12 @@ package com.schedulerprojectdevelop.user.dto;
 import lombok.Getter;
 
 @Getter
-public class CreateUserResponse {
+public class SessionUser {
     private final Long userId;
-    private final String userName;
     private final String userEmail;
 
-    public CreateUserResponse(Long userId, String userName, String userEmail) {
+    public SessionUser(Long userId, String userEmail) {
         this.userId = userId;
-        this.userName = userName;
         this.userEmail = userEmail;
     }
 }

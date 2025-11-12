@@ -2,6 +2,8 @@ package com.schedulerprojectdevelop.schedule.controller;
 
 import com.schedulerprojectdevelop.schedule.dto.*;
 import com.schedulerprojectdevelop.schedule.service.ScheduleService;
+import com.schedulerprojectdevelop.user.dto.SessionUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +21,19 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PostMapping("/users/{userId}/scheduler")
+    @PostMapping("/schedules")
     public ResponseEntity<CreateScheduleResponse> save(
-            @PathVariable Long userId,
-            @RequestBody CreateScheduleRequest request
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
+            @Valid @RequestBody CreateScheduleRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getUserId(), request));
     }
 
     /**
      * 일정 전체 조회
      * @return
      */
-    @GetMapping("/scheduler")
+    @GetMapping("/schedules")
     public ResponseEntity<List<GetScheduleResponse>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findAll());
     }
@@ -41,7 +43,7 @@ public class ScheduleController {
      * @param scheduleId
      * @return
      */
-    @GetMapping("/scheduler/{scheduleId}")
+    @GetMapping("/schedules/{scheduleId}")
     public ResponseEntity<GetScheduleResponse> findOne(
             @PathVariable Long scheduleId
     ) {
@@ -54,24 +56,26 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PutMapping("/scheduler/{scheduleId}")
+    @PutMapping("/schedules/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> update(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId,
-            @RequestBody UpdateScheduleRequest request
+            @Valid @RequestBody UpdateScheduleRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(scheduleId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getUserId(), scheduleId, request));
     }
 
     /**
-     * 일정 수정
+     * 일정 삭제
      * @param scheduleId
      * @return
      */
-    @DeleteMapping("/scheduler/{scheduleId}")
+    @DeleteMapping("/schedules/{scheduleId}")
     public ResponseEntity<Void> delete(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId
     ) {
-        scheduleService.delete(scheduleId);
+        scheduleService.delete(sessionUser.getUserId(), scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class UpdateUserRequest {
-    @NotBlank(message = "이름을 입력해주세요.")
-    private String userName;
+public class LoginRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.")
     @Pattern(regexp = "^[\\w!#$%&'*+/=?`{|}~^.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "이메일 형식이 올바르지 않습니다.")

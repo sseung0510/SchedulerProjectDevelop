@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class UpdateUserRequest {
+public class RegisterRequest {
+
     @NotBlank(message = "이름을 입력해주세요.")
     private String userName;
 

@@ -35,8 +35,8 @@ public class ScheduleService {
         return new CreateScheduleResponse(
                 savedSchedule.getId(),
                 savedSchedule.getUser().getId(),
-                savedSchedule.getScheduleTitle(),
-                savedSchedule.getScheduleContent(),
+                savedSchedule.getTitle(),
+                savedSchedule.getContent(),
                 savedSchedule.getCreatedAt(),
                 savedSchedule.getModifiedAt()
         );
@@ -53,8 +53,8 @@ public class ScheduleService {
                 .map(schedule -> new GetScheduleResponse(
                         schedule.getId(),
                         schedule.getUser().getId(),
-                        schedule.getScheduleTitle(),
-                        schedule.getScheduleContent()
+                        schedule.getTitle(),
+                        schedule.getContent()
                 )).toList();
     }
 
@@ -72,30 +72,31 @@ public class ScheduleService {
         return new GetScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getScheduleTitle(),
-                schedule.getScheduleContent()
+                schedule.getTitle(),
+                schedule.getContent()
         );
     }
 
     /**
      * 일정 수정
-     * @param scheduleId
-     * @param request
-     * @return
      */
     @Transactional
-    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
+    public UpdateScheduleResponse update(Long userId, Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다.")
         );
+
+        if(!schedule.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("작성자만 수정 가능합니다");
+        }
 
         schedule.updateSchedule(request.getScheduleTitle(), request.getScheduleContent());
 
         return new UpdateScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getScheduleTitle(),
-                schedule.getScheduleContent(),
+                schedule.getTitle(),
+                schedule.getContent(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt()
         );
@@ -103,13 +104,15 @@ public class ScheduleService {
 
     /**
      * 일정 삭제
-     * @param scheduleId
      */
     @Transactional
-    public void delete(Long scheduleId) {
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if(!existence) {
-            throw new IllegalStateException("일정이 없습니다.");
+    public void delete(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("일정이 없습니다.")
+        );
+
+        if(!schedule.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("작성자만 수정 가능합니다");
         }
         scheduleRepository.deleteById(scheduleId);
     }
