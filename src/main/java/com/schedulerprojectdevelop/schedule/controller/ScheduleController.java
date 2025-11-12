@@ -2,6 +2,7 @@ package com.schedulerprojectdevelop.schedule.controller;
 
 import com.schedulerprojectdevelop.schedule.dto.*;
 import com.schedulerprojectdevelop.schedule.service.ScheduleService;
+import com.schedulerprojectdevelop.user.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PostMapping("/users/{userId}/scheduler")
+    @PostMapping("/scheduler")
     public ResponseEntity<CreateScheduleResponse> save(
-            @PathVariable Long userId,
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @RequestBody CreateScheduleRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getUserId(), request));
     }
 
     /**

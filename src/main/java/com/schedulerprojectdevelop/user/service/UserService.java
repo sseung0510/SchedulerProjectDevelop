@@ -17,10 +17,10 @@ public class UserService {
     private final ScheduleRepository scheduleRepository;
 
     @Transactional
-    public CreateUserResponse save(CreateUserRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         User user = new User(request.getUserName(), request.getUserEmail(), request.getUserPassword());
         User savedUser = userRepository.save(user);
-        return new CreateUserResponse(
+        return new RegisterResponse(
                 savedUser.getId(),
                 savedUser.getUserName(),
                 savedUser.getUserEmail()
@@ -71,5 +71,16 @@ public class UserService {
         }
         scheduleRepository.deleteById(userId);
         userRepository.deleteById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public SessionUser login(LoginRequest request) {
+        User user = userRepository.findByUserEmail(request.getUserEmail()).orElseThrow(
+                () -> new IllegalStateException("없는 유저입니다.")
+        );
+        return new SessionUser(
+                user.getId(),
+                user.getUserEmail()
+        );
     }
 }

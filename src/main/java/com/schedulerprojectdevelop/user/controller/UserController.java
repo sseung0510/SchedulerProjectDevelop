@@ -2,6 +2,7 @@ package com.schedulerprojectdevelop.user.controller;
 
 import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +16,15 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 유저 생성
+     * 회원가입
      * @param request
      * @return
      */
-    @PostMapping("/users")
-    public ResponseEntity<CreateUserResponse> save(
-            @RequestBody CreateUserRequest request
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(
+            @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(request));
     }
 
     /**
@@ -73,4 +74,19 @@ public class UserController {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    /**
+     * 로그인
+     */
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(
+            @RequestBody LoginRequest request,
+            HttpSession session
+    ){
+        SessionUser sessionUser = userService.login(request);
+        session.setAttribute("loginUser", sessionUser);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
 }
