@@ -1,5 +1,6 @@
 package com.schedulerprojectdevelop.user.service;
 
+import com.schedulerprojectdevelop.config.PasswordEncoder;
 import com.schedulerprojectdevelop.schedule.repository.ScheduleRepository;
 import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.entity.User;
@@ -17,6 +18,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
@@ -25,8 +27,14 @@ public class UserService {
      */
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        User user = new User(request.getUserName(), request.getUserEmail(), request.getUserPassword());
+        User user = new User(
+                request.getUserName(),
+                request.getUserEmail(),
+                passwordEncoder.encode(request.getUserPassword())
+        );
+
         User savedUser = userRepository.save(user);
+
         return new RegisterResponse(
                 savedUser.getId(),
                 savedUser.getName(),
@@ -77,8 +85,8 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
-        if(!user.getPassword().equals(request.getUserPassword())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다");
+        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         user.updateUser(request.getUserName(), request.getUserEmail());
         return new UpdateUserResponse(
@@ -100,8 +108,8 @@ public class UserService {
                 () -> new IllegalStateException("없는 유저입니다.")
         );
 
-        if(!user.getPassword().equals(request.getUserPassword())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다");
+        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
         scheduleRepository.deleteById(userId);
@@ -118,7 +126,7 @@ public class UserService {
         User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
-        if(!user.getPassword().equals(request.getUserPassword())) {
+        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return new SessionUser(

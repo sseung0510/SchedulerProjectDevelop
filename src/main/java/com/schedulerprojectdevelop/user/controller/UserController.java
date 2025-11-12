@@ -1,5 +1,6 @@
 package com.schedulerprojectdevelop.user.controller;
 
+import com.schedulerprojectdevelop.config.PasswordEncoder;
 import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
