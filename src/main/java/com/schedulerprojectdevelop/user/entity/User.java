@@ -17,22 +17,22 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String userName;
+    private String name;
 
     @Column(nullable = false)
-    private String userEmail;
+    private String email;
 
     @Column(nullable = false)
-    private String userPassword;
+    private String password;
 
-    public User(String userName, String userEmail, String userPassword) {
-        this.userName = userName;
-        this.userEmail = userEmail;
-        this.userPassword = userPassword;
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
-    public void updateUser(String userName, String userEmail) {
-        this.userName = userName;
-        this.userEmail = userEmail;
+    public void updateUser(String name, String email) {
+        this.name = name;
+        this.email = email;
     }
 }

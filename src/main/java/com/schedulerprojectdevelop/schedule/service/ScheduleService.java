@@ -35,8 +35,8 @@ public class ScheduleService {
         return new CreateScheduleResponse(
                 savedSchedule.getId(),
                 savedSchedule.getUser().getId(),
-                savedSchedule.getScheduleTitle(),
-                savedSchedule.getScheduleContent(),
+                savedSchedule.getTitle(),
+                savedSchedule.getContent(),
                 savedSchedule.getCreatedAt(),
                 savedSchedule.getModifiedAt()
         );
@@ -53,8 +53,8 @@ public class ScheduleService {
                 .map(schedule -> new GetScheduleResponse(
                         schedule.getId(),
                         schedule.getUser().getId(),
-                        schedule.getScheduleTitle(),
-                        schedule.getScheduleContent()
+                        schedule.getTitle(),
+                        schedule.getContent()
                 )).toList();
     }
 
@@ -72,8 +72,8 @@ public class ScheduleService {
         return new GetScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getScheduleTitle(),
-                schedule.getScheduleContent()
+                schedule.getTitle(),
+                schedule.getContent()
         );
     }
 
@@ -95,8 +95,8 @@ public class ScheduleService {
         return new UpdateScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getScheduleTitle(),
-                schedule.getScheduleContent(),
+                schedule.getTitle(),
+                schedule.getContent(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt()
         );
@@ -114,7 +114,6 @@ public class ScheduleService {
         if(!schedule.getUser().getId().equals(userId)) {
             throw new IllegalStateException("작성자만 수정 가능합니다");
         }
-
         scheduleRepository.deleteById(scheduleId);
     }
 

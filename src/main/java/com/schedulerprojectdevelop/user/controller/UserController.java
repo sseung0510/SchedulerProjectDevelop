@@ -3,6 +3,7 @@ package com.schedulerprojectdevelop.user.controller;
 import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class UserController {
      */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
-            @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(request));
     }
@@ -57,7 +58,7 @@ public class UserController {
     @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> update(
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
-            @RequestBody UpdateUserRequest request
+            @Valid @RequestBody UpdateUserRequest request
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getUserId(), request));
     }
@@ -70,7 +71,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<Void> delete(
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
-            @RequestBody DeleteUserRequest request,
+            @Valid @RequestBody DeleteUserRequest request,
             HttpSession session
     ) {
         if (sessionUser == null) {
@@ -86,7 +87,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<Void> login(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpSession session
     ){
         SessionUser sessionUser = userService.login(request);

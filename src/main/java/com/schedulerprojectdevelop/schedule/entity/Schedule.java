@@ -18,24 +18,24 @@ public class Schedule extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String scheduleTitle;
+    private String title;
 
     @Column(nullable = false)
-    private String scheduleContent;
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Schedule(String scheduleTitle, String scheduleContent, User user) {
-        this.scheduleTitle = scheduleTitle;
-        this.scheduleContent = scheduleContent;
+    public Schedule(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
         this.user = user;
     }
 
 
-    public void updateSchedule(String scheduleTitle, String scheduleContent) {
-        this.scheduleTitle = scheduleTitle;
-        this.scheduleContent = scheduleContent;
+    public void updateSchedule(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }
