@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 일정 수정 response
+ */
 @Getter
 public class UpdateScheduleResponse {
     private final Long scheduleId;

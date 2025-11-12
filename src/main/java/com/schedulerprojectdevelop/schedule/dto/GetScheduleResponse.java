@@ -2,6 +2,9 @@ package com.schedulerprojectdevelop.schedule.dto;
 
 import lombok.Getter;
 
+/**
+ * 일정 조회 response
+ */
 @Getter
 public class GetScheduleResponse {
     private final Long scheduleId;

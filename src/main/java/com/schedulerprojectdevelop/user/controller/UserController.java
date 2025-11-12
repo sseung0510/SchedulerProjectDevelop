@@ -14,6 +14,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    /**
+     * 유저 생성
+     * @param request
+     * @return
+     */
     @PostMapping("/users")
     public ResponseEntity<CreateUserResponse> save(
             @RequestBody CreateUserRequest request
@@ -21,11 +26,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
 
+    /**
+     * 유저 전체 조회
+     * @return
+     */
     @GetMapping("/users")
     public ResponseEntity<List<GetUserResponse>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
     }
 
+    /**
+     * 유저 단건 조회
+     * @param userId
+     * @return
+     */
     @GetMapping("/users/{userId}")
     public ResponseEntity<GetUserResponse> findOne(
             @PathVariable Long userId
@@ -33,6 +47,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(userId));
     }
 
+    /**
+     * 유저 정보 수정
+     * @param userId
+     * @param request
+     * @return
+     */
     @PutMapping("/users/{userId}")
     public ResponseEntity<UpdateUserResponse> update(
             @PathVariable Long userId,
@@ -41,6 +61,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, request));
     }
 
+    /**
+     * 유저 삭제
+     * @param userId
+     * @return
+     */
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long userId

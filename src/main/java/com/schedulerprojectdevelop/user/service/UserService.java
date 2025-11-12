@@ -18,10 +18,10 @@ public class UserService {
 
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
-        User user = new User(request.getUserName(), request.getUserEmail());
+        User user = new User(request.getUserName(), request.getUserEmail(), request.getUserPassword());
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(
-                savedUser.getUserId(),
+                savedUser.getId(),
                 savedUser.getUserName(),
                 savedUser.getUserEmail()
         );
@@ -32,7 +32,7 @@ public class UserService {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(user -> new GetUserResponse(
-                        user.getUserId(),
+                        user.getId(),
                         user.getUserName(),
                         user.getUserEmail()
                 )).toList();
@@ -44,7 +44,7 @@ public class UserService {
                 () -> new IllegalStateException("없는 유저입니다.")
         );
         return new GetUserResponse(
-                user.getUserId(),
+                user.getId(),
                 user.getUserName(),
                 user.getUserEmail()
         );
@@ -57,7 +57,7 @@ public class UserService {
         );
         user.updateUser(request.getUserName(), request.getUserEmail());
         return new UpdateUserResponse(
-                user.getUserId(),
+                user.getId(),
                 user.getUserName(),
                 user.getUserEmail()
         );
