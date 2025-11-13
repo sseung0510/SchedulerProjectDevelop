@@ -98,7 +98,6 @@ public class UserService {
 
     /**
      * 유저 회원탈퇴
-     *
      * @param userId
      * @param request
      */
