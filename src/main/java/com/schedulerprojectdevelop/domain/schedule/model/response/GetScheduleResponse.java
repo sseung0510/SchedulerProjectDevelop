@@ -1,0 +1,21 @@
+package com.schedulerprojectdevelop.domain.schedule.model.response;
+
+import lombok.Getter;
+
+/**
+ * 일정 조회 response
+ */
+@Getter
+public class GetScheduleResponse {
+    private final Long scheduleId;
+    private final Long userId;
+    private final String scheduleTitle;
+    private final String scheduleContent;
+
+    public GetScheduleResponse(Long scheduleId, Long userId, String scheduleTitle, String scheduleContent) {
+        this.scheduleId = scheduleId;
+        this.userId = userId;
+        this.scheduleTitle = scheduleTitle;
+        this.scheduleContent = scheduleContent;
+    }
+}
