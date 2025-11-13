@@ -20,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
@@ -28,7 +29,7 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PostMapping("/schedules")
+    @PostMapping
     public ResponseEntity<CreateScheduleResponse> save(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody CreateScheduleRequest request
@@ -43,7 +44,7 @@ public class ScheduleController {
      * 일정 전체 조회
      * @return
      */
-    @GetMapping("/schedules")
+    @GetMapping
     public ResponseEntity<List<GetScheduleResponse>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findAll());
     }
@@ -53,7 +54,7 @@ public class ScheduleController {
      * @param scheduleId
      * @return
      */
-    @GetMapping("/schedules/{scheduleId}")
+    @GetMapping("/{scheduleId}")
     public ResponseEntity<GetScheduleCommentResponse> findOne(
             @PathVariable Long scheduleId
     ) {
@@ -66,7 +67,7 @@ public class ScheduleController {
      * @param request
      * @return
      */
-    @PutMapping("/schedules/{scheduleId}")
+    @PutMapping("/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> update(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId,
@@ -83,7 +84,7 @@ public class ScheduleController {
      * @param scheduleId
      * @return
      */
-    @DeleteMapping("/schedules/{scheduleId}")
+    @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> delete(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId

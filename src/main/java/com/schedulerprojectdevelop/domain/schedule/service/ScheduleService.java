@@ -134,6 +134,7 @@ public class ScheduleService {
         if(!schedule.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorMessage.FORBIDDEN_UPDATE_NOT_AUTHOR);
         }
+        commentRepository.deleteBySchedule_Id(scheduleId);
         scheduleRepository.deleteById(scheduleId);
     }
 
