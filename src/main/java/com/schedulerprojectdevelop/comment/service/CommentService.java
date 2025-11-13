@@ -28,9 +28,9 @@ public class CommentService {
      */
     @Transactional
     public CreateCommentResponse createComment(Long userId, CreateCommentRequest request, long scheduleId) {
-        if(userId == null) {
-            throw new IllegalArgumentException("로그인 해주세요");
-        }
+//        if(userId == null) {
+//            throw new IllegalArgumentException("로그인 해주세요");
+//        }
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("유저가 존재하지 않습니다.")
         );

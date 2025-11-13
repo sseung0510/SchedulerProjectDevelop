@@ -1,5 +1,8 @@
 package com.schedulerprojectdevelop.schedule.service;
 
+import com.schedulerprojectdevelop.comment.dto.GetCommentResponse;
+import com.schedulerprojectdevelop.comment.entity.Comment;
+import com.schedulerprojectdevelop.comment.repository.CommentRepository;
 import com.schedulerprojectdevelop.schedule.dto.*;
 import com.schedulerprojectdevelop.schedule.entity.Schedule;
 import com.schedulerprojectdevelop.schedule.repository.ScheduleRepository;
@@ -17,6 +20,7 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 일정 생성
@@ -59,21 +63,30 @@ public class ScheduleService {
     }
 
     /**
-     * 일정 단건 조회
+     * 일정 단건 조회 + 댓글 조회
      * @param scheduleId
      * @return
      */
     @Transactional(readOnly = true)
-    public GetScheduleResponse findOne(Long scheduleId) {
+    public GetScheduleCommentResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다.")
         );
 
-        return new GetScheduleResponse(
+        List<Comment> comments = commentRepository.findBySchedule_Id(scheduleId);
+        List<GetCommentResponse> commentList = comments.stream().map(comment -> new GetCommentResponse(
+                comment.getId(),
+                comment.getContent(),
+                comment.getUser().getId(),
+                comment.getCreatedAt()
+        )).toList();
+
+        return new GetScheduleCommentResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
                 schedule.getTitle(),
-                schedule.getContent()
+                schedule.getContent(),
+                commentList
         );
     }
 

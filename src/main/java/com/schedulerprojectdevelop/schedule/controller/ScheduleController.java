@@ -26,6 +26,9 @@ public class ScheduleController {
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody CreateScheduleRequest request
     ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getUserId(), request));
     }
 
@@ -44,7 +47,7 @@ public class ScheduleController {
      * @return
      */
     @GetMapping("/schedules/{scheduleId}")
-    public ResponseEntity<GetScheduleResponse> findOne(
+    public ResponseEntity<GetScheduleCommentResponse> findOne(
             @PathVariable Long scheduleId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findOne(scheduleId));
@@ -62,6 +65,9 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @Valid @RequestBody UpdateScheduleRequest request
     ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
+        }
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getUserId(), scheduleId, request));
     }
 
@@ -75,6 +81,9 @@ public class ScheduleController {
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId
     ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
+        }
         scheduleService.delete(sessionUser.getUserId(), scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

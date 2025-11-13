@@ -1,6 +1,5 @@
 package com.schedulerprojectdevelop.user.controller;
 
-import com.schedulerprojectdevelop.config.PasswordEncoder;
 import com.schedulerprojectdevelop.user.dto.*;
 import com.schedulerprojectdevelop.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -61,6 +60,9 @@ public class UserController {
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody UpdateUserRequest request
     ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
+        }
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getUserId(), request));
     }
 
@@ -75,8 +77,8 @@ public class UserController {
             @Valid @RequestBody DeleteUserRequest request,
             HttpSession session
     ) {
-        if (sessionUser == null) {
-            return ResponseEntity.badRequest().build();
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
         }
         userService.delete(sessionUser.getUserId(), request);
         session.invalidate();
@@ -104,12 +106,12 @@ public class UserController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser
-            , HttpSession session) {
-        if (sessionUser == null) {
-            return ResponseEntity.badRequest().build();
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
+            HttpSession session
+    ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
         }
-
         session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

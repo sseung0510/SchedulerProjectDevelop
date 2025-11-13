@@ -28,6 +28,13 @@ public class CommentController {
             @Valid @RequestBody CreateCommentRequest request,
             @PathVariable long scheduleId
     ) {
+        if(sessionUser == null) {
+            throw new IllegalArgumentException("로그인해주세요");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(sessionUser.getUserId(), request, scheduleId));
     }
+
+
+
+
 }
