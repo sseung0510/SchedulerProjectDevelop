@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -32,24 +31,23 @@ public class GlobalExceptionHandler {
                 );
     }
 
-//    // 유효성 검사 실패 시 처리 (@Valid 관련 예외)
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ErrorResponse> handleResponseStatusException(MethodArgumentNotValidException ex, WebRequest request) {
-//
-//        String message = "Validation failed";
-//
-//        FieldError fieldError = ex.getBindingResult().getFieldError();
-//        if(fieldError != null) {
-//            message = fieldError.getDefaultMessage();
-//        }
-//
-//        ErrorResponse errorResponse = new ErrorResponse(
-//                LocalDateTime.now(),
-//                ex.getStatusCode().value(),
-//                ex.getStatusCode().toString(),
-//                message,
-//                request.getDescription(false)
-//        );
-//        return new ResponseEntity<>(errorResponse, ex.getStatusCode());
-//    }
+    // 유효성 검사 실패 시 처리 (@Valid 관련 예외)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(MethodArgumentNotValidException e, WebRequest request) {
+        log.error("유효성 검사 실패(MethodArgumentNotValidException) 발생 {} : ", e.getMessage());
+        String message = "Validation failed";
+
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        if(fieldError != null) {
+            message = fieldError.getDefaultMessage();
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                400,
+                message,
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, e.getStatusCode());
+    }
 }

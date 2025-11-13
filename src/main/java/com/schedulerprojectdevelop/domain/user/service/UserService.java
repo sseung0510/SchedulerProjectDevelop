@@ -3,6 +3,7 @@ package com.schedulerprojectdevelop.domain.user.service;
 import com.schedulerprojectdevelop.common.config.PasswordEncoder;
 import com.schedulerprojectdevelop.common.exception.CustomException;
 import com.schedulerprojectdevelop.common.exception.ErrorMessage;
+import com.schedulerprojectdevelop.domain.comment.repository.CommentRepository;
 import com.schedulerprojectdevelop.domain.schedule.repository.ScheduleRepository;
 import com.schedulerprojectdevelop.domain.user.model.SessionUser;
 import com.schedulerprojectdevelop.domain.user.model.request.DeleteUserRequest;
@@ -15,10 +16,8 @@ import com.schedulerprojectdevelop.domain.user.model.response.UpdateUserResponse
 import com.schedulerprojectdevelop.common.entity.User;
 import com.schedulerprojectdevelop.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -28,14 +27,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CommentRepository commentRepository;
 
     /**
      * 회원가입
-     * @param request
-     * @return RegisterResponse
      */
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        boolean existence = userRepository.existsByEmail(request.getUserEmail());
+
+        if(existence) {
+            throw new CustomException(ErrorMessage.EMAIL_DUPLICATED);
+        }
         User user = new User(
                 request.getUserName(),
                 request.getUserEmail(),
@@ -53,7 +56,6 @@ public class UserService {
 
     /**
      * 유저 전체 조회
-     * @return GetUserResponse
      */
     @Transactional(readOnly = true)
     public List<GetUserResponse> findAll() {
@@ -68,14 +70,10 @@ public class UserService {
 
     /**
      * 유저 단건 조회
-     * @param userId
-     * @return GetUserResponse
      */
     @Transactional(readOnly = true)
     public GetUserResponse findOne(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
-        );
+        User user = findByUser(userId);
         return new GetUserResponse(
                 user.getId(),
                 user.getName(),
@@ -85,19 +83,14 @@ public class UserService {
 
     /**
      * 유저 정보 수정
-     * @param userId
-     * @param request
-     * @return UpdateUserResponse
      */
     @Transactional
     public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
-        );
-        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_MISMATCH_PASSWORD);
-        }
-        user.updateUser(request.getUserName(), request.getUserEmail());
+        User user = findByUser(userId);
+
+        matchedPassword(request.getUserPassword(), user.getPassword());
+
+        user.updateUser(request.getUserName());
         return new UpdateUserResponse(
                 user.getId(),
                 user.getName(),
@@ -107,43 +100,47 @@ public class UserService {
 
     /**
      * 유저 회원탈퇴
-     * @param userId
-     * @param request
      */
     @Transactional
     public void delete(Long userId, DeleteUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
-        );
+        User user = findByUser(userId);
 
-        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_MISMATCH_PASSWORD);
-        }
+        matchedPassword(request.getUserPassword(), user.getPassword());
 
-        scheduleRepository.deleteById(userId);
+        commentRepository.deleteByUser_Id(userId);
+        scheduleRepository.deleteByUser_Id(userId);
         userRepository.deleteById(userId);
     }
 
     /**
      * 로그인
-     * @param request
-     * @return
      */
     @Transactional(readOnly = true)
     public SessionUser login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getUserEmail()).orElseThrow(
                 () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
         );
-        if(!passwordEncoder.matches(request.getUserPassword(), user.getPassword())) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_MISMATCH_PASSWORD);
-        }
+
+        matchedPassword(request.getUserPassword(), user.getPassword());
+
         return new SessionUser(
                 user.getId(),
                 user.getEmail()
         );
     }
+
+    // 회원 확인
+    public User findByUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
+        );
+    }
+
+    // 비밀번호 일치 확인
+    public void matchedPassword(String requestedPassword, String userPassword) {
+        if(!passwordEncoder.matches(requestedPassword, userPassword)) {
+            throw new CustomException(ErrorMessage.UNAUTHORIZED_MISMATCH_PASSWORD);
+        }
+    }
 }
-/**
- * 회원 탈퇴 오류
- *
- */
+

@@ -27,8 +27,6 @@ public class UserController {
 
     /**
      * 회원가입
-     * @param request
-     * @return
      */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
@@ -39,7 +37,6 @@ public class UserController {
 
     /**
      * 유저 전체 조회
-     * @return
      */
     @GetMapping("/users")
     public ResponseEntity<List<GetUserResponse>> findAll() {
@@ -48,8 +45,6 @@ public class UserController {
 
     /**
      * 유저 단건 조회
-     * @param userId
-     * @return
      */
     @GetMapping("/users/{userId}")
     public ResponseEntity<GetUserResponse> findOne(
@@ -60,25 +55,18 @@ public class UserController {
 
     /**
      * 유저 정보 수정
-     * @param
-     * @param request
-     * @return
      */
     @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> update(
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody UpdateUserRequest request
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getUserId(), request));
     }
 
     /**
      * 유저 탈퇴
-     * @param
-     * @return
      */
     @DeleteMapping("/users")
     public ResponseEntity<Void> delete(
@@ -86,9 +74,7 @@ public class UserController {
             @Valid @RequestBody DeleteUserRequest request,
             HttpSession session
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         userService.delete(sessionUser.getUserId(), request);
         session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -109,21 +95,21 @@ public class UserController {
 
     /**
      * 로그아웃
-     * @param sessionUser
-     * @param session
-     * @return
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             HttpSession session
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-
+    // 로그인 체크
+    public void checkedLogin(SessionUser sessionUser) {
+        if(sessionUser == null) {
+            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
+        }
+    }
 }
