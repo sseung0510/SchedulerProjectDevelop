@@ -26,23 +26,18 @@ public class ScheduleController {
 
     /**
      * 일정 생성
-     * @param request
-     * @return
      */
     @PostMapping
     public ResponseEntity<CreateScheduleResponse> save(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody CreateScheduleRequest request
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getUserId(), request));
     }
 
     /**
      * 일정 전체 조회
-     * @return
      */
     @GetMapping
     public ResponseEntity<List<GetScheduleResponse>> findAll() {
@@ -50,9 +45,7 @@ public class ScheduleController {
     }
 
     /**
-     * 일정 단건 조회
-     * @param scheduleId
-     * @return
+     * 일정 단건 조회 + 댓글 조회
      */
     @GetMapping("/{scheduleId}")
     public ResponseEntity<GetScheduleCommentResponse> findOne(
@@ -63,9 +56,6 @@ public class ScheduleController {
 
     /**
      * 일정 수정
-     * @param scheduleId
-     * @param request
-     * @return
      */
     @PutMapping("/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> update(
@@ -73,27 +63,27 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @Valid @RequestBody UpdateScheduleRequest request
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getUserId(), scheduleId, request));
     }
 
     /**
      * 일정 삭제
-     * @param scheduleId
-     * @return
      */
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> delete(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         scheduleService.delete(sessionUser.getUserId(), scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    // 로그인 체크
+    public void checkedLogin(SessionUser sessionUser) {
+        if(sessionUser == null) {
+            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
+        }
+    }
 }

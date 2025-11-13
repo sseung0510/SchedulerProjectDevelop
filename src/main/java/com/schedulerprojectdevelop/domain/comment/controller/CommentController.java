@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +21,6 @@ public class CommentController {
 
     /**
      * 댓글 생성
-     * @param sessionUser
-     * @param request
-     * @param scheduleId
-     * @return
      */
     @PostMapping("/schedules/{scheduleId}/comments")
     public ResponseEntity<CreateCommentResponse> createComment(
@@ -33,9 +28,7 @@ public class CommentController {
             @Valid @RequestBody CreateCommentRequest request,
             @PathVariable long scheduleId
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(sessionUser.getUserId(), request, scheduleId));
     }
 
@@ -49,9 +42,7 @@ public class CommentController {
             @PathVariable Long scheduleId,
             @PathVariable Long commentId
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(sessionUser.getUserId(), request, scheduleId, commentId));
     }
 
@@ -64,12 +55,15 @@ public class CommentController {
             @PathVariable Long scheduleId,
             @PathVariable Long commentId
     ) {
-        if(sessionUser == null) {
-            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
-        }
+        checkedLogin(sessionUser);
         commentService.deleteComment(sessionUser.getUserId(), scheduleId, commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-
+    // 로그인 체크
+    public void checkedLogin(SessionUser sessionUser) {
+        if(sessionUser == null) {
+            throw new CustomException(ErrorMessage.UNAUTHORIZED_LOGIN_REQUIRED);
+        }
+    }
 }

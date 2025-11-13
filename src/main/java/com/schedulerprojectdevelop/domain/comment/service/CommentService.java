@@ -26,10 +26,6 @@ public class CommentService {
 
     /**
      * 댓글 생성
-     * @param userId
-     * @param request
-     * @param scheduleId
-     * @return CreateCommentResponse
      */
     @Transactional
     public CreateCommentResponse createComment(Long userId, CreateCommentRequest request, long scheduleId) {
@@ -56,11 +52,7 @@ public class CommentService {
         findByScheduleId(scheduleId);
 
         Comment comment = findByCommentId(commentId);
-
-        if(!comment.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorMessage.FORBIDDEN_UPDATE_NOT_AUTHOR);
-        }
-
+        matchedAuthor(userId, comment.getUser().getId());
         comment.updateComment(request.getContent());
 
         return new UpdateCommentResponse(
@@ -78,33 +70,37 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long userId, Long scheduleId, Long commentId) {
         Comment comment = findByCommentId(commentId);
-        if(!comment.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorMessage.FORBIDDEN_UPDATE_NOT_AUTHOR);
-        }
+        matchedAuthor(userId, comment.getUser().getId());
         commentRepository.delete(comment);
     }
 
-    // 회원 존재 여부
+
+    // 회원 확인
     public User findByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
         );
     }
 
-    // 일정 존재 여부
+    // 일정 확인
     public Schedule findByScheduleId(Long scheduleId) {
         return scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(ErrorMessage.NOT_FOUND_SCHEDULE)
         );
     }
 
-    // 댓글 존재 여부
+    // 댓글 확인
     public Comment findByCommentId(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(
                 () -> new CustomException(ErrorMessage.NOT_FOUND_COMMENT)
         );
     }
 
-
+    // 작성자 일치 확인
+    public void matchedAuthor(Long userId, Long commentUserId) {
+        if(!userId.equals(commentUserId)) {
+            throw new CustomException(ErrorMessage.FORBIDDEN_ONLY_AUTHOR);
+        }
+    }
 
 }

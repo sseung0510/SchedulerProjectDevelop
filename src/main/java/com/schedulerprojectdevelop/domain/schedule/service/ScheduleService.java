@@ -31,15 +31,10 @@ public class ScheduleService {
 
     /**
      * 일정 생성
-     * @param userId
-     * @param request
-     * @return
      */
     @Transactional
     public CreateScheduleResponse save(Long userId, CreateScheduleRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
-        );
+        User user = findByUserId(userId);
 
         Schedule schedule = new Schedule(request.getScheduleTitle(), request.getScheduleContent(), user);
         Schedule savedSchedule = scheduleRepository.save(schedule);
@@ -55,7 +50,6 @@ public class ScheduleService {
 
     /**
      * 일정 전체 조회
-     * @return
      */
     @Transactional(readOnly = true)
     public List<GetScheduleResponse> findAll() {
@@ -71,22 +65,19 @@ public class ScheduleService {
 
     /**
      * 일정 단건 조회 + 댓글 조회
-     * @param scheduleId
-     * @return
      */
     @Transactional(readOnly = true)
     public GetScheduleCommentResponse findOne(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_SCHEDULE)
-        );
+        Schedule schedule = findByScheduleId(scheduleId);
 
         List<Comment> comments = commentRepository.findBySchedule_Id(scheduleId);
-        List<GetCommentResponse> commentList = comments.stream().map(comment -> new GetCommentResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getUser().getId(),
-                comment.getCreatedAt()
-        )).toList();
+        List<GetCommentResponse> commentList = comments.stream()
+                .map(comment -> new GetCommentResponse(
+                        comment.getId(),
+                    comment.getContent(),
+                    comment.getUser().getId(),
+                    comment.getCreatedAt()
+                )).toList();
 
         return new GetScheduleCommentResponse(
                 schedule.getId(),
@@ -102,14 +93,8 @@ public class ScheduleService {
      */
     @Transactional
     public UpdateScheduleResponse update(Long userId, Long scheduleId, UpdateScheduleRequest request) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_SCHEDULE)
-        );
-
-        if(!schedule.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorMessage.FORBIDDEN_UPDATE_NOT_AUTHOR);
-        }
-
+        Schedule schedule = findByScheduleId(scheduleId);
+        matchedAuthor(userId, schedule.getUser().getId());
         schedule.updateSchedule(request.getScheduleTitle(), request.getScheduleContent());
 
         return new UpdateScheduleResponse(
@@ -127,16 +112,31 @@ public class ScheduleService {
      */
     @Transactional
     public void delete(Long userId, Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new CustomException(ErrorMessage.NOT_FOUND_SCHEDULE)
-        );
+        Schedule schedule = findByScheduleId(scheduleId);
+        matchedAuthor(userId, schedule.getUser().getId());
 
-        if(!schedule.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorMessage.FORBIDDEN_UPDATE_NOT_AUTHOR);
-        }
         commentRepository.deleteBySchedule_Id(scheduleId);
         scheduleRepository.deleteById(scheduleId);
     }
 
+    // 회원 확인
+    public User findByUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorMessage.NOT_FOUND_USER)
+        );
+    }
 
+    // 일정 확인
+    public Schedule findByScheduleId(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new CustomException(ErrorMessage.NOT_FOUND_SCHEDULE)
+        );
+    }
+
+    // 작성자 일치 확인
+    public void matchedAuthor(Long userId, Long commentUserId) {
+        if(!userId.equals(commentUserId)) {
+            throw new CustomException(ErrorMessage.FORBIDDEN_ONLY_AUTHOR);
+        }
+    }
 }
