@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     // ResponseStatusException 발생 시 처리
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(CustomException e) {
-        log.error("CustomException 발생 {} : ", e.getMessage());
+        log.error("CustomException 발생 : ", e);
 
         return ResponseEntity
                 .status(e.getErrorMessage().getStatus())
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     // 유효성 검사 실패 시 처리 (@Valid 관련 예외)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(MethodArgumentNotValidException e, WebRequest request) {
-        log.error("유효성 검사 실패(MethodArgumentNotValidException) 발생 {} : ", e.getMessage());
+        log.error("유효성 검사 실패(MethodArgumentNotValidException) 발생 : ", e);
         String message = "Validation failed";
 
         FieldError fieldError = e.getBindingResult().getFieldError();
