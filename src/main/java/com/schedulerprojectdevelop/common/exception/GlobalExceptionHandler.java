@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
-                400,
+                e.getStatusCode().value(),
                 message,
                 request.getDescription(false)
         );
