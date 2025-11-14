@@ -7,15 +7,14 @@ import com.schedulerprojectdevelop.common.entity.Comment;
 import com.schedulerprojectdevelop.domain.comment.repository.CommentRepository;
 import com.schedulerprojectdevelop.domain.schedule.model.request.CreateScheduleRequest;
 import com.schedulerprojectdevelop.domain.schedule.model.request.UpdateScheduleRequest;
-import com.schedulerprojectdevelop.domain.schedule.model.response.CreateScheduleResponse;
-import com.schedulerprojectdevelop.domain.schedule.model.response.GetScheduleCommentResponse;
-import com.schedulerprojectdevelop.domain.schedule.model.response.GetScheduleResponse;
-import com.schedulerprojectdevelop.domain.schedule.model.response.UpdateScheduleResponse;
+import com.schedulerprojectdevelop.domain.schedule.model.response.*;
 import com.schedulerprojectdevelop.common.entity.Schedule;
 import com.schedulerprojectdevelop.domain.schedule.repository.ScheduleRepository;
 import com.schedulerprojectdevelop.common.entity.User;
 import com.schedulerprojectdevelop.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +59,25 @@ public class ScheduleService {
                         schedule.getUser().getId(),
                         schedule.getTitle(),
                         schedule.getContent()
+                )).toList();
+    }
+
+    /**
+     * 페이징 추가
+     */
+    @Transactional(readOnly = true)
+    public List<GetSchedulePageResponse> findAllScheduleWithPage(int pageNumber, int pageSize) {
+        int offset = pageNumber * pageSize;
+        List<Schedule> schedules = scheduleRepository.getProdustWithCustomQuery(pageSize, offset);
+
+        return schedules.stream()
+                .map(schedule -> new GetSchedulePageResponse(
+                        schedule.getTitle(),
+                        schedule.getContent(),
+                        commentRepository.countBySchedule_Id(schedule.getId()),
+                        schedule.getCreatedAt(),
+                        schedule.getModifiedAt(),
+                        schedule.getUser().getName()
                 )).toList();
     }
 
@@ -139,4 +157,6 @@ public class ScheduleService {
             throw new CustomException(ErrorMessage.FORBIDDEN_ONLY_AUTHOR);
         }
     }
+
+
 }
