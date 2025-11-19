@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+/**
+ * 댓글 생성 request
+ */
 @Getter
 public class CreateCommentRequest {
     @NotBlank(message = "내용을 입력해주세요")

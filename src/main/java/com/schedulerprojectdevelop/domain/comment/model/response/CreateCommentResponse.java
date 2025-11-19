@@ -2,6 +2,9 @@ package com.schedulerprojectdevelop.domain.comment.model.response;
 
 import lombok.Getter;
 
+/**
+ * 댓글 생성 Response
+ */
 @Getter
 public class CreateCommentResponse {
     private final Long commentId;

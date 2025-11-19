@@ -5,6 +5,7 @@ import com.schedulerprojectdevelop.common.exception.ErrorMessage;
 import com.schedulerprojectdevelop.domain.comment.model.request.CreateCommentRequest;
 import com.schedulerprojectdevelop.domain.comment.model.request.UpdateCommentRequest;
 import com.schedulerprojectdevelop.domain.comment.model.response.CreateCommentResponse;
+import com.schedulerprojectdevelop.domain.comment.model.response.GetCommentResponse;
 import com.schedulerprojectdevelop.domain.comment.model.response.UpdateCommentResponse;
 import com.schedulerprojectdevelop.domain.comment.service.CommentService;
 import com.schedulerprojectdevelop.domain.user.model.SessionUser;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +33,16 @@ public class CommentController {
     ) {
         checkedLogin(sessionUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(sessionUser.getUserId(), request, scheduleId));
+    }
+
+    /**
+     * 댓글 조회
+     */
+    @GetMapping("/schedules/{scheduleId}/comments")
+    public ResponseEntity<List<GetCommentResponse>> getAllComment(
+            @PathVariable long scheduleId
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.getAllComment(scheduleId));
     }
 
     /**

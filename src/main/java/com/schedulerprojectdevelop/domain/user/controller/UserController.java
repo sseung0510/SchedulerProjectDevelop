@@ -39,43 +39,54 @@ public class UserController {
      * 유저 전체 조회
      */
     @GetMapping("/users")
-    public ResponseEntity<List<GetUserResponse>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
+    public ResponseEntity<List<GetUserResponse>> findAllUser() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUser());
     }
 
     /**
      * 유저 단건 조회
      */
     @GetMapping("/users/{userId}")
-    public ResponseEntity<GetUserResponse> findOne(
+    public ResponseEntity<GetUserResponse> findOneUser(
             @PathVariable Long userId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findOneUser(userId));
+    }
+
+    /**
+     * 로그인한 유저 정보 조회
+     */
+    @GetMapping("/users/myPage")
+    public ResponseEntity<GetUserResponse> findLoginUser(
+            @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser
+    ) {
+        checkedLogin(sessionUser);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findOneUser(sessionUser.getUserId()));
     }
 
     /**
      * 유저 정보 수정
      */
     @PutMapping("/users")
-    public ResponseEntity<UpdateUserResponse> update(
+    public ResponseEntity<UpdateUserResponse> updateUser(
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody UpdateUserRequest request
     ) {
         checkedLogin(sessionUser);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getUserId(), request));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(sessionUser.getUserId(), request));
     }
 
     /**
      * 유저 탈퇴
      */
     @DeleteMapping("/users")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> deleteUser(
             @SessionAttribute(name="loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody DeleteUserRequest request,
             HttpSession session
     ) {
         checkedLogin(sessionUser);
-        userService.delete(sessionUser.getUserId(), request);
+        userService.deleteUser(sessionUser.getUserId(), request);
         session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
