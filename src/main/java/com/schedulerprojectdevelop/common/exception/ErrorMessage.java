@@ -18,5 +18,4 @@ public enum ErrorMessage {
 
     private final HttpStatus status;
     private final String message;
-
 }

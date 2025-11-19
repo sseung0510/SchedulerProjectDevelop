@@ -2,6 +2,9 @@ package com.schedulerprojectdevelop.domain.user.model;
 
 import lombok.Getter;
 
+/**
+ * 세션 정보
+ */
 @Getter
 public class SessionUser {
     private final Long userId;

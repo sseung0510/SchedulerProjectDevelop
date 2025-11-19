@@ -6,6 +6,7 @@ import com.schedulerprojectdevelop.domain.comment.model.request.CreateCommentReq
 import com.schedulerprojectdevelop.domain.comment.model.request.UpdateCommentRequest;
 import com.schedulerprojectdevelop.domain.comment.model.response.CreateCommentResponse;
 import com.schedulerprojectdevelop.common.entity.Comment;
+import com.schedulerprojectdevelop.domain.comment.model.response.GetCommentResponse;
 import com.schedulerprojectdevelop.domain.comment.model.response.UpdateCommentResponse;
 import com.schedulerprojectdevelop.domain.comment.repository.CommentRepository;
 import com.schedulerprojectdevelop.common.entity.Schedule;
@@ -16,6 +17,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,6 @@ public class CommentService {
     @Transactional
     public CreateCommentResponse createComment(Long userId, CreateCommentRequest request, long scheduleId) {
         User user = findByUserId(userId);
-
         Schedule schedule = findByScheduleId(scheduleId);
 
         Comment comment = new Comment(request.getContent(), user, schedule);
@@ -41,6 +43,22 @@ public class CommentService {
                 savedComment.getUser().getId(),
                 savedComment.getSchedule().getId()
         );
+    }
+
+    /**
+     * 댓글 조회
+     */
+    @Transactional(readOnly = true)
+    public List<GetCommentResponse> getAllComment(long scheduleId) {
+        findByScheduleId(scheduleId);
+        List<Comment> comments = commentRepository.findBySchedule_Id(scheduleId);
+        return comments.stream()
+                .map(comment -> new GetCommentResponse(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getUser().getId(),
+                        comment.getCreatedAt()
+                )).toList();
     }
 
     /**
@@ -74,7 +92,6 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-
     // 회원 확인
     public User findByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(
@@ -102,5 +119,4 @@ public class CommentService {
             throw new CustomException(ErrorMessage.FORBIDDEN_ONLY_AUTHOR);
         }
     }
-
 }

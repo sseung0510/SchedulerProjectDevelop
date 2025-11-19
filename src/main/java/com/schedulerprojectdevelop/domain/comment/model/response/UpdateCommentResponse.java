@@ -4,6 +4,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 댓글 수정 Response
+ */
 @Getter
 public class UpdateCommentResponse {
     private final Long commentId;
@@ -11,7 +14,6 @@ public class UpdateCommentResponse {
     private final Long userId;
     private final LocalDateTime createAt;
     private final LocalDateTime updateAt;
-
 
     public UpdateCommentResponse(Long commentId, String content, Long userId, LocalDateTime createAt, LocalDateTime updateAt) {
         this.commentId = commentId;

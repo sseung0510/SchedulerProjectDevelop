@@ -2,6 +2,9 @@ package com.schedulerprojectdevelop.domain.user.model.response;
 
 import lombok.Getter;
 
+/**
+ * 회원가입 Response
+ */
 @Getter
 public class RegisterResponse {
     private final Long userId;

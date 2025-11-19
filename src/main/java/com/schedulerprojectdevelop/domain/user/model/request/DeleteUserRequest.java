@@ -3,6 +3,9 @@ package com.schedulerprojectdevelop.domain.user.model.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+/**
+ * 유저 탈퇴 Request
+ */
 @Getter
 public class DeleteUserRequest {
 

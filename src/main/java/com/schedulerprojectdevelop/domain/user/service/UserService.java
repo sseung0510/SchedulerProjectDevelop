@@ -39,6 +39,7 @@ public class UserService {
         if(existence) {
             throw new CustomException(ErrorMessage.EMAIL_DUPLICATED);
         }
+
         User user = new User(
                 request.getUserName(),
                 request.getUserEmail(),
@@ -58,7 +59,7 @@ public class UserService {
      * 유저 전체 조회
      */
     @Transactional(readOnly = true)
-    public List<GetUserResponse> findAll() {
+    public List<GetUserResponse> findAllUser() {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(user -> new GetUserResponse(
@@ -72,7 +73,7 @@ public class UserService {
      * 유저 단건 조회
      */
     @Transactional(readOnly = true)
-    public GetUserResponse findOne(Long userId) {
+    public GetUserResponse findOneUser(Long userId) {
         User user = findByUser(userId);
         return new GetUserResponse(
                 user.getId(),
@@ -85,7 +86,7 @@ public class UserService {
      * 유저 정보 수정
      */
     @Transactional
-    public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
+    public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
         User user = findByUser(userId);
 
         matchedPassword(request.getUserPassword(), user.getPassword());
@@ -102,7 +103,7 @@ public class UserService {
      * 유저 회원탈퇴
      */
     @Transactional
-    public void delete(Long userId, DeleteUserRequest request) {
+    public void deleteUser(Long userId, DeleteUserRequest request) {
         User user = findByUser(userId);
 
         matchedPassword(request.getUserPassword(), user.getPassword());
@@ -143,4 +144,3 @@ public class UserService {
         }
     }
 }
-

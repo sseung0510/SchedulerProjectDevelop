@@ -1,6 +1,5 @@
 package com.schedulerprojectdevelop.domain.schedule.controller;
 
-import com.schedulerprojectdevelop.common.entity.Schedule;
 import com.schedulerprojectdevelop.common.exception.CustomException;
 import com.schedulerprojectdevelop.common.exception.ErrorMessage;
 import com.schedulerprojectdevelop.domain.schedule.model.request.CreateScheduleRequest;
@@ -10,10 +9,6 @@ import com.schedulerprojectdevelop.domain.schedule.service.ScheduleService;
 import com.schedulerprojectdevelop.domain.user.model.SessionUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +25,12 @@ public class ScheduleController {
      * 일정 생성
      */
     @PostMapping
-    public ResponseEntity<CreateScheduleResponse> save(
+    public ResponseEntity<CreateScheduleResponse> createSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody CreateScheduleRequest request
     ) {
         checkedLogin(sessionUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getUserId(), request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(sessionUser.getUserId(), request));
     }
 
     /**
@@ -50,38 +45,38 @@ public class ScheduleController {
     }
 
     /**
-     * 일정 단건 조회 + 댓글 조회
+     * 일정 단건 조회
      */
     @GetMapping("/{scheduleId}")
-    public ResponseEntity<GetScheduleCommentResponse> findOne(
+    public ResponseEntity<GetScheduleResponse> findOneSchedule(
             @PathVariable Long scheduleId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findOne(scheduleId));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findOneSchedule(scheduleId));
     }
 
     /**
      * 일정 수정
      */
     @PutMapping("/{scheduleId}")
-    public ResponseEntity<UpdateScheduleResponse> update(
+    public ResponseEntity<UpdateScheduleResponse> updateSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId,
             @Valid @RequestBody UpdateScheduleRequest request
     ) {
         checkedLogin(sessionUser);
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getUserId(), scheduleId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(sessionUser.getUserId(), scheduleId, request));
     }
 
     /**
      * 일정 삭제
      */
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> deleteSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId
     ) {
         checkedLogin(sessionUser);
-        scheduleService.delete(sessionUser.getUserId(), scheduleId);
+        scheduleService.deleteSchedule(sessionUser.getUserId(), scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

@@ -3,6 +3,9 @@ package com.schedulerprojectdevelop.domain.schedule.model.response;
 import lombok.Getter;
 import java.time.LocalDateTime;
 
+/**
+ * 일정 조회 페이징 Response
+ */
 @Getter
 public class GetSchedulePageResponse {
     private final String SchedulePageTitle;
