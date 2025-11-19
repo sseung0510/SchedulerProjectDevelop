@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 public class GetSchedulePageResponse {
     private final String SchedulePageTitle;
     private final String SchedulePageContent;
-    private final int commentCount;
+    private final Long commentCount;
     private final LocalDateTime createAt;
     private final LocalDateTime modifiedAt;
     private final String userName;
 
-    public GetSchedulePageResponse(String schedulePageTitle, String schedulePageContent, int commentCount, LocalDateTime createAt, LocalDateTime modifiedAt, String userName) {
+    public GetSchedulePageResponse(String schedulePageTitle, String schedulePageContent, Long commentCount, LocalDateTime createAt, LocalDateTime modifiedAt, String userName) {
         SchedulePageTitle = schedulePageTitle;
         SchedulePageContent = schedulePageContent;
         this.commentCount = commentCount;

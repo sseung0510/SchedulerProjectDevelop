@@ -11,10 +11,12 @@ import com.schedulerprojectdevelop.domain.schedule.repository.ScheduleRepository
 import com.schedulerprojectdevelop.common.entity.User;
 import com.schedulerprojectdevelop.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,19 +49,19 @@ public class ScheduleService {
      * 페이징 추가
      */
     @Transactional(readOnly = true)
-    public List<GetSchedulePageResponse> findAllScheduleWithPage(int pageNumber, int pageSize) {
-        int offset = pageNumber * pageSize;
-        List<Schedule> schedules = scheduleRepository.getProdustWithCustomQuery(pageSize, offset);
+    public Page<GetSchedulePageResponse> findAllScheduleWithPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
 
-        return schedules.stream()
-                .map(schedule -> new GetSchedulePageResponse(
-                        schedule.getTitle(),
-                        schedule.getContent(),
-                        commentRepository.countBySchedule_Id(schedule.getId()),
-                        schedule.getCreatedAt(),
-                        schedule.getModifiedAt(),
-                        schedule.getUser().getName()
-                )).toList();
+        Page<Schedule> schedules = scheduleRepository.findAllScheduleWithPage(pageable);
+
+        return schedules.map(schedule -> new GetSchedulePageResponse(
+                schedule.getTitle(),
+                schedule.getContent(),
+                commentRepository.countBySchedule_Id(schedule.getId()),
+                schedule.getCreatedAt(),
+                schedule.getModifiedAt(),
+                schedule.getUser().getName()
+        ));
     }
 
     /**
@@ -128,4 +130,6 @@ public class ScheduleService {
             throw new CustomException(ErrorMessage.FORBIDDEN_ONLY_AUTHOR);
         }
     }
+
+
 }
