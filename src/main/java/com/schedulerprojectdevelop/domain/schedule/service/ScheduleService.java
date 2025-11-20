@@ -51,17 +51,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public Page<GetSchedulePageResponse> findAllScheduleWithPage(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
-
-        Page<Schedule> schedules = scheduleRepository.findAllScheduleWithPage(pageable);
-
-        return schedules.map(schedule -> new GetSchedulePageResponse(
-                schedule.getTitle(),
-                schedule.getContent(),
-                commentRepository.countBySchedule_Id(schedule.getId()),
-                schedule.getCreatedAt(),
-                schedule.getModifiedAt(),
-                schedule.getUser().getName()
-        ));
+        return scheduleRepository.findAllScheduleWithPage(pageable);
     }
 
     /**
