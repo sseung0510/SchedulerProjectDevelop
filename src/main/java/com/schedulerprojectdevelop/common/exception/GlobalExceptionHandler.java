@@ -42,12 +42,13 @@ public class GlobalExceptionHandler {
             message = fieldError.getDefaultMessage();
         }
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                e.getStatusCode().value(),
-                message,
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, e.getStatusCode());
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        e.getStatusCode().value(),
+                        message,
+                        request.getDescription(false))
+                );
     }
 }
